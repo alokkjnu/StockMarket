@@ -1,0 +1,11 @@
+{% extends 'StockMarket/base.html' %}
+{% block content%}
+    <h3>{{ stock_name.issuer_name }}</h3>
+    <video width="320" height="240" controls>
+  <source src="{{ stock_name.video.url }}" type="video/mp4">
+</video>
+    <h4>Stock Details</h4>
+    <p>Security Code: {{ stock_name.security_code }}, Issuer Name: {{ stock_name.issuer_name  }}, Security Id: {{ stock_name.security_id }}<br>
+    Status: {{ stock_name.status }}, Group: {{ stock_name.group }}, Face Value: {{ stock_name.face_value }},<br>
+        ISIN No: {{ stock_name.isin_no }}, Industry: {{ stock_name.industry }}, Instrument: {{ stock_name.instrument }}</p>
+{% endblock %}

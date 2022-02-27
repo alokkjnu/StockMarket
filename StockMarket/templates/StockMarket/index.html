@@ -1,0 +1,86 @@
+{% extends 'StockMarket/base.html' %}
+{% load static %}
+{% block content%}
+<div class="container my-4 post-wrapper">
+        <!-- Search Start -->
+        <div class="jumbotron border shadow">
+            <div class="row">
+                <div class="col-md-8 offset-2">
+                    <form>
+                        <div class="input-group">
+                            <input name="s" type="text" placeholder="Search" class="form-control form-control-lg" />
+                            <div class="input-group-append">
+                                <button class="btn btn-dark btn-lg">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- End Search -->
+
+        <h3>All Stocks</h3>
+        {% for stockname in stock_name %}
+        <div class="card my-3 sm">
+            <h5 class="card-header">
+                <a href="{{ stockname.get_absolute_url }}">{{ stockname.issuer_name }}</a>
+                <a href="{% url 'StockMarket:query' %}">query</a>
+            </h5>
+        </div>
+        {% endfor %}
+
+
+</div>
+    <p class="text-center">
+        <button class="btn btn-dark" id="loadmoreBtn">Load More</button>
+    </p>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $("#loadmoreBtn").on('click',function(){
+            var _currentResult=$(".sm").length;
+            // Run Ajax
+            $.ajax({
+                url:"{% url 'StockMarket:load-more' %}",
+                type:'post',
+                data:{
+                    'offset':_currentResult,
+                    'csrfmiddlewaretoken':"{{csrf_token}}"
+                },
+                dataType:'json',
+                beforeSend:function(){
+                    $("#loadmoreBtn").addClass('disabled').text('Loading..');
+                },
+                success:function(res){
+                    var _html='';
+                    var json_data=$.parseJSON(res.stock_list);
+                    $.each(json_data,function(index,data){
+                        _html+='<div class="card my-3 sm">\
+            <h5 class="card-header"><a href="{{ stockname.get_absolute_url }}">'+data.fields.issuer_name+'</a>\
+            <a href="{% url 'StockMarket:query' %}">query</a>\
+            </h5>\
+        </div>';
+                    });
+                    $(".post-wrapper").append(_html);
+                    var _countTotal=$(".sm").length;
+                    if(_countTotal==res.totalResult){
+                        $("#loadmoreBtn").remove();
+                    }else{
+                        $("#loadmoreBtn").removeClass('disabled').text('Load More');
+                    }
+                }
+            });
+        });
+    });
+</script>
+    <script>
+function openForm() {
+  document.getElementById("query_form").style.display = "block";
+}
+
+function closeForm() {
+  document.getElementById("query_form").style.display = "none";
+}
+</script>
+
+{% endblock %}
